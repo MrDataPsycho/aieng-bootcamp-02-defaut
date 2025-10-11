@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     environment:
-      - BACKEND_API_URL=http://api:8000
+      - API_URL=http://api:8000
     restart: unless-stopped
     volumes:
       - ./src/chatbot_ui:/app/src/chatbot_ui
