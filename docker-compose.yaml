@@ -12,10 +12,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/chatbot_ui:/app/src/chatbot_ui
-    networks:
-      - app-network
-    depends_on:
-      - api
 
   api:
     build:
@@ -28,9 +24,12 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/api:/app/src/api
-    networks:
-      - app-network
 
-networks:
-  app-network:
-    driver: bridge
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    volumes:
+      - ./qdrant_storage:/qdrant/storage:z
+    restart: unless-stopped

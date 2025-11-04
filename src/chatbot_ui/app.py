@@ -1,7 +1,17 @@
 import streamlit as st
 import requests
+import logging
+logging.getLogger("watchdog").setLevel(logging.INFO)
 
 from core.config import config
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
 
 ## Lets create a sidebar with a dropdown for the model list and providers
 with st.sidebar:
@@ -36,20 +46,25 @@ def api_call(method, url, **kwargs):
         try:
             response_data = response.json()
         except requests.exceptions.JSONDecodeError:
+            logger.error("Invalid response format from server")
             response_data = {"message": "Invalid response format from server"}
 
         if response.ok:
             return True, response_data
 
+        logger.error(f"API call failed: {response_data}")
         return False, response_data
 
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as ce:
+        logger.error(f"Connection error: {ce}")
         _show_error_popup("Connection error. Please check your network connection.")
         return False, {"message": "Connection error"}
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as te:
+        logger.error(f"Request timeout: {te}")
         _show_error_popup("The request timed out. Please try again later.")
         return False, {"message": "Request timeout"}
     except Exception as e:
+        logger.exception(f"Unexpected error: {e}")
         _show_error_popup(f"An unexpected error occurred: {str(e)}")
         return False, {"message": str(e)}
 
@@ -63,6 +78,7 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("Hello! How can I assist you today?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
+    logger.info(f"User prompt: {prompt}")
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -70,5 +86,6 @@ if prompt := st.chat_input("Hello! How can I assist you today?"):
         output = api_call("post", f"{config.API_URL}/chat", json={"provider": st.session_state.provider, "model_name": st.session_state.model_name, "messages": st.session_state.messages})
         response_data = output[1]
         answer = response_data["message"]
+        logger.info(f"Assistant response: {answer}")
         st.write(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
