@@ -2,7 +2,6 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 import uuid
 import logging
-from typing import Callable
 
 
 logger = logging.getLogger(__name__)
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 class RequestIDMiddleware(BaseHTTPMiddleware):
     """Middleware that adds a unique request ID to each request."""
 
-    async def dispatch(self, request: Request, call_next: Callable):
+    async def dispatch(self, request: Request, call_next):
         
         request_id = str(uuid.uuid4())
 
