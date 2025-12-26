@@ -52,4 +52,4 @@ This is a Python 3.12 starter template for AI-powered applications with Agents c
 ## Core Stack
 
 - Python 3.12 with uv as the package manager
-- AI SDK 5 with OpenAI GPT-5 integration and web search tool
+- Any UI update always bump the version up by 0.0.1 in `src/chatbot_ui/app.py`
