@@ -27,27 +27,13 @@ def get_qdrant_url() -> str:
     """
     Get the Qdrant URL based on the environment.
     
-    Uses QDRANT_URL environment variable if set, otherwise defaults based on environment.
-    - Docker: http://qdrant:6333
-    - Local: http://localhost:6333
+    Uses QDRANT_URL environment variable if set, otherwise defaults to localhost.
+    Set QDRANT_URL in docker-compose.yaml or .env file as needed.
     
     Returns:
-        The Qdrant service URL
+        The Qdrant service URL (default: http://localhost:6333)
     """
-    # Check for explicit QDRANT_URL environment variable
-    qdrant_url = os.getenv("QDRANT_URL")
-    
-    if qdrant_url:
-        return qdrant_url
-    
-    # Check if running in Docker
-    is_docker = os.getenv("DOCKER_ENV", "").lower() in ["true", "1", "yes"]
-    
-    if is_docker:
-        return "http://qdrant:6333"
-    
-    # Default to localhost for local development
-    return "http://localhost:6333"
+    return os.getenv("QDRANT_URL", "http://localhost:6333")
 
 
 # Qdrant configuration
