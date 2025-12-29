@@ -9,7 +9,7 @@ from langsmith import traceable, get_current_run_tree
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue, Prefetch, FusionQuery, Document
 
-from api.rag.utils.prompt_management import prompt_template_config
+from api.agent.utils.prompt_management import prompt_template_config
 
 
 class RAGUsedContext(BaseModel):
