@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
 import logging
-
+import uuid
+import time
 from core.config import config
 
 logging.basicConfig(level=logging.INFO)
@@ -13,6 +14,11 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+def get_or_create_session_id():
+    if 'session_id' not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
+    return st.session_state.session_id
 
 
 def api_call(method, url, **kwargs):
@@ -82,14 +88,24 @@ if prompt := st.chat_input("Hello! How can I assist you today?"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        status, output = api_call("post", f"{config.API_URL}/rag", json={"query": prompt})
+        
+        session_id = get_or_create_session_id()
+        
+        start_time = time.time()
+        with st.spinner("Thinking..."):
+            status, output = api_call("post", f"{config.API_URL}/rag", json={"query": prompt, "thread_id": session_id})
+        
+        elapsed_time = int(time.time() - start_time)
 
         answer = output["answer"]
         used_context = output["used_context"]
 
         st.session_state.used_context = used_context
 
-        st.write(answer)
+        # Create the full response with elapsed time
+        full_response = f"{answer}\n\n*⏱️ Responded in {elapsed_time} seconds*"
+        
+        st.markdown(full_response)
 
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
     st.rerun()

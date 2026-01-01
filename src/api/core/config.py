@@ -36,9 +36,28 @@ def get_qdrant_url() -> str:
     return os.getenv("QDRANT_URL", "http://localhost:6333")
 
 
+def get_postgres_connection_string() -> str:
+    """
+    Get the PostgreSQL connection string based on the environment.
+    
+    Uses POSTGRES_CONNECTION_STRING environment variable if set, otherwise defaults to localhost.
+    Set POSTGRES_CONNECTION_STRING in docker-compose.yaml or .env file as needed.
+    
+    Returns:
+        The PostgreSQL connection string (default: localhost:5433)
+    """
+    return os.getenv(
+        "POSTGRES_CONNECTION_STRING",
+        "postgresql://langgraph_user:langgraph_password@localhost:5433/langgraph_db"
+    )
+
+
 # Qdrant configuration
 QDRANT_URL = get_qdrant_url()
 QDRANT_COLLECTION_NAME = "Amazon-items-collection-01-hybrid-search"
+
+# PostgreSQL configuration
+POSTGRES_CONNECTION_STRING = get_postgres_connection_string()
 
 if __name__ == "__main__":
     print(config)

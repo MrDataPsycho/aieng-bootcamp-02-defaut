@@ -2,6 +2,11 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 WORKDIR /app
 
+# Install PostgreSQL client libraries required by psycopg
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Enable bytecode compilation and Python optimization
 ENV UV_COMPILE_BYTECODE=1
 ENV PYTHONOPTIMIZE=1
